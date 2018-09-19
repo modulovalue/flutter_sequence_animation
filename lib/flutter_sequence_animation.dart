@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 
-class _AnimationInformation {
-  _AnimationInformation({
+class AnimationInformation {
+  AnimationInformation({
     this.animatable,
-    this.from,
-    this.to,
-    this.curve,
+    Duration from = Duration.zero,
+    Duration to,
+    this.curve = Curves.linear,
     this.tag,
-  });
+    Duration delay = Duration.zero,
+  }) : this.from = from + delay, this.to = to + delay, assert(to >= from);
 
   final Animatable animatable;
   final Duration from;
@@ -18,7 +19,7 @@ class _AnimationInformation {
 }
 
 class SequenceAnimationBuilder {
-  List<_AnimationInformation> _animations = [];
+  List<AnimationInformation> _animations = [];
 
   /// Adds an [Animatable] to the sequence, in the most cases this would be a [Tween].
   /// The from and to [Duration] specify points in time where the animation takes place.
@@ -48,9 +49,18 @@ class SequenceAnimationBuilder {
     Curve curve: Curves.linear,
     @required Object tag,
   }) {
-    assert(to >= from);
-    _animations.add(new _AnimationInformation(
+    _animations.add(new AnimationInformation(
         animatable: animatable, from: from, to: to, curve: curve, tag: tag));
+    return this;
+  }
+
+  SequenceAnimationBuilder add(AnimationInformation info) {
+    _animations.add(info);
+    return this;
+  }
+
+  SequenceAnimationBuilder addAll(Iterable<AnimationInformation> listOfInfo) {
+    _animations.addAll(listOfInfo);
     return this;
   }
 
